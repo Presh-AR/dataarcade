@@ -174,7 +174,7 @@
             border: 2px solid var(--glass-border);
             border-radius: 24px;
             padding: 40px;
-            max-width: 520px;
+            max-width: 900px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -1167,6 +1167,57 @@
             .hud {
                 flex-direction: column;
                 gap: 10px;
+            }
+        }
+
+        /* Desktop optimizations for wider modals */
+        @media (min-width: 768px) {
+            .modal {
+                padding: 50px;
+            }
+
+            .difficulty-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .mode-toggle {
+                flex-direction: row;
+            }
+
+            .share-buttons {
+                flex-wrap: nowrap;
+                justify-content: center;
+            }
+
+            .btn-social {
+                flex: 1;
+                max-width: 200px;
+            }
+
+            .game-instructions {
+                padding: 25px 30px;
+            }
+
+            .threats-avoided-section {
+                padding: 25px;
+            }
+
+            .leaderboard-section {
+                padding: 25px;
+            }
+
+            .share-info-section {
+                padding: 25px;
+            }
+
+            .action-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .action-buttons .btn {
+                flex: 1;
+                max-width: 250px;
             }
         }
 
