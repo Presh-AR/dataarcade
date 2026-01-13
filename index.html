@@ -13,21 +13,21 @@
            ROOT VARIABLES & RESET
            ========================================== */
         :root {
-            --primary: #FFFFFF;
-            --primary-dark: #CCCCCC;
-            --secondary: #888888;
-            --accent: #FFFFFF;
-            --danger: #FF4444;
+            --primary: #00D4FF;
+            --primary-dark: #0099CC;
+            --secondary: #FF6B9D;
+            --accent: #FFD93D;
+            --danger: #FF4757;
             --warning: #FFAA00;
             --success: #00FF88;
-            --bg-dark: #000000;
-            --bg-medium: #000000;
-            --bg-gradient: #000000;
+            --bg-dark: #1A1A2E;
+            --bg-medium: #16213E;
+            --bg-gradient: #0F0F23;
             --text-light: #FFFFFF;
-            --text-muted: #AAAAAA;
-            --glass: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --neon-glow: 0 0 10px rgba(255, 255, 255, 0.3);
+            --text-muted: #B8C5D6;
+            --glass: rgba(0, 212, 255, 0.1);
+            --glass-border: rgba(0, 212, 255, 0.3);
+            --neon-glow: 0 0 15px rgba(0, 212, 255, 0.5);
             --font-display: 'Orbitron', sans-serif;
             --font-body: 'Rajdhani', sans-serif;
             --font-mono: 'Courier New', monospace;
@@ -103,7 +103,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #000000;
+            background: linear-gradient(135deg, #1A1A2E 0%, #0F0F23 50%, #16213E 100%);
         }
 
         #game-container::before {
@@ -158,7 +158,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: #000000;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(15, 15, 35, 0.98) 100%);
             pointer-events: none;
         }
 
@@ -167,8 +167,8 @@
         }
 
         .modal {
-            background: #000000;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: linear-gradient(145deg, #1A1A2E 0%, #16213E 100%);
+            border: 2px solid var(--glass-border);
             border-radius: 24px;
             padding: 40px;
             max-width: 520px;
@@ -370,15 +370,15 @@
         }
 
         .btn-secondary {
-            background: rgba(108, 92, 231, 0.2);
+            background: rgba(0, 212, 255, 0.15);
             border: 2px solid var(--glass-border);
             color: var(--text-light);
         }
 
         .btn-secondary:hover {
-            background: rgba(108, 92, 231, 0.3);
+            background: rgba(0, 212, 255, 0.25);
             border-color: var(--primary);
-            box-shadow: 0 0 30px rgba(0, 255, 209, 0.2);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
         }
 
         .btn-cta {
@@ -679,13 +679,30 @@
         }
 
         .badge-earned {
-            background: linear-gradient(135deg, var(--warning) 0%, var(--accent) 100%);
             border-radius: 16px;
             padding: 20px;
             margin: 25px 0;
-            animation: badgeReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1), badgeShine 3s ease-in-out infinite;
+            animation: badgeReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
+        }
+        
+        /* Expert tier - Gold */
+        .badge-earned[data-tier="expert"] {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+            animation: badgeReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1), expertShine 2s ease-in-out infinite;
+        }
+        
+        /* Pro tier - Silver/Blue */
+        .badge-earned[data-tier="pro"] {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 50%, #006699 100%);
+            animation: badgeReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1), proShine 2.5s ease-in-out infinite;
+        }
+        
+        /* Intern tier - Subtle encouragement */
+        .badge-earned[data-tier="intern"] {
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.3) 0%, rgba(0, 212, 255, 0.2) 100%);
+            border: 2px dashed rgba(0, 212, 255, 0.5);
         }
 
         @keyframes badgeReveal {
@@ -693,9 +710,14 @@
             to { transform: scale(1) rotate(0deg); opacity: 1; }
         }
 
-        @keyframes badgeShine {
-            0%, 100% { box-shadow: 0 5px 30px rgba(253, 203, 110, 0.4); }
-            50% { box-shadow: 0 10px 50px rgba(253, 203, 110, 0.6), 0 0 20px rgba(253, 121, 168, 0.3); }
+        @keyframes expertShine {
+            0%, 100% { box-shadow: 0 5px 30px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 10px 50px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 140, 0, 0.5); }
+        }
+        
+        @keyframes proShine {
+            0%, 100% { box-shadow: 0 5px 30px rgba(0, 212, 255, 0.4); }
+            50% { box-shadow: 0 10px 50px rgba(0, 212, 255, 0.6), 0 0 20px rgba(0, 153, 204, 0.4); }
         }
 
         .badge-earned::before {
@@ -705,6 +727,15 @@
             right: -10px;
             top: -20px;
             opacity: 0.2;
+        }
+        
+        .badge-earned[data-tier="intern"]::before {
+            content: '📚';
+            font-size: 60px;
+        }
+        
+        .badge-earned[data-tier="expert"]::before {
+            content: '🏆';
         }
 
         .badge-earned.hidden {
@@ -716,11 +747,19 @@
             margin-bottom: 8px;
             font-size: 1.1rem;
         }
+        
+        .badge-earned[data-tier="intern"] h4 {
+            color: var(--text-light);
+        }
 
         .badge-earned p {
             color: rgba(0, 0, 0, 0.7);
             font-size: 0.9rem;
             font-weight: 600;
+        }
+        
+        .badge-earned[data-tier="intern"] p {
+            color: var(--text-muted);
         }
 
         .vault-tip {
@@ -877,13 +916,13 @@
         }
 
         .hud-item {
-            background: rgba(13, 2, 33, 0.9);
+            background: rgba(26, 26, 46, 0.95);
             backdrop-filter: blur(15px);
             border: 2px solid var(--glass-border);
             border-radius: 14px;
             padding: 14px 22px;
             pointer-events: auto;
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 212, 255, 0.1);
         }
 
         .hud-score {
@@ -895,7 +934,49 @@
 
         .hud-score span {
             color: var(--primary);
-            text-shadow: 0 0 20px rgba(0, 255, 209, 0.5);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .hud-lives {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .hud-lives .heart {
+            font-size: 1.4rem;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 8px rgba(255, 71, 87, 0.6));
+        }
+
+        .hud-lives .heart.active {
+            animation: heartPulse 1.5s ease-in-out infinite;
+        }
+
+        .hud-lives .heart.lost {
+            filter: grayscale(100%) opacity(0.3);
+            animation: heartLost 0.5s ease-out;
+        }
+
+        .hud-lives .heart.damage {
+            animation: heartDamage 0.5s ease-out;
+        }
+
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes heartLost {
+            0% { transform: scale(1.5); filter: brightness(2); }
+            100% { transform: scale(1); filter: grayscale(100%) opacity(0.3); }
+        }
+
+        @keyframes heartDamage {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.3) rotate(-10deg); }
+            50% { transform: scale(0.8) rotate(10deg); }
+            75% { transform: scale(1.2) rotate(-5deg); }
         }
 
         .hud-controls {
@@ -904,7 +985,7 @@
         }
 
         .hud-btn {
-            background: rgba(108, 92, 231, 0.3);
+            background: rgba(0, 212, 255, 0.2);
             border: 2px solid var(--glass-border);
             border-radius: 10px;
             padding: 10px 15px;
@@ -914,6 +995,7 @@
             font-size: 0.85rem;
             font-family: var(--font-body);
             font-weight: 600;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
         }
 
         .hud-btn:hover {
@@ -1125,64 +1207,32 @@
     </style>
 </head>
 <body>
-    <!-- Registration Modal -->
-    <div id="registration-modal" class="modal-overlay" role="dialog" aria-labelledby="reg-title" aria-modal="true">
-        <div class="modal">
-            <div class="logo-container">
-                <div class="logo-icon" aria-hidden="true">🛡️</div>
-                <h1 id="reg-title" class="game-title">Recovery Runner</h1>
-                <p class="game-subtitle">Powered by AutoRABIT Vault</p>
-            </div>
-            
-            <form id="registration-form" novalidate>
-                <div class="form-group">
-                    <label for="player-name">Your Name</label>
-                    <input type="text" id="player-name" name="name" placeholder="Enter your name" required aria-required="true">
-                    <p class="form-error" id="name-error">Please enter your name</p>
-                </div>
-                
-                <div class="form-group">
-                    <label for="player-email">Email Address</label>
-                    <input type="email" id="player-email" name="email" placeholder="you@company.com" required aria-required="true">
-                    <p class="form-error" id="email-error">Please enter a valid email address</p>
-                </div>
-                
-                <div class="form-group">
-                    <label for="player-industry">Your Industry</label>
-                    <select id="player-industry" name="industry" aria-label="Select your industry">
-                        <option value="">Select your industry...</option>
-                        <option value="banking">Banking & Financial Services</option>
-                        <option value="healthcare">Healthcare & Life Sciences</option>
-                        <option value="retail">Retail & Consumer Goods</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-primary btn-full">
-                    🚀 Enter the Data Zone
-                </button>
-            </form>
-        </div>
-    </div>
-
     <!-- Start Screen Modal -->
-    <div id="start-modal" class="modal-overlay hidden" role="dialog" aria-labelledby="start-title" aria-modal="true">
+    <div id="start-modal" class="modal-overlay" role="dialog" aria-labelledby="start-title" aria-modal="true">
         <div class="modal start-screen">
             <div class="logo-container">
                 <div class="logo-icon" aria-hidden="true">🏃</div>
                 <h1 id="start-title" class="game-title">Ready to Run?</h1>
             </div>
             
-            <p class="welcome-text" id="welcome-text">Welcome, Player!</p>
             <p class="industry-intro" id="industry-intro" style="font-size: 1.1rem; line-height: 1.6; margin: 20px 0;">
                 <strong>Your Mission:</strong> Jump over data disasters that threaten your business. Each hazard represents a real risk that can cost your company thousands in fines, lost revenue, and reputation damage. Learn what these threats mean for your business as you play!
-            </p>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 15px;">
-                💡 <strong>Tip:</strong> As hazards approach, you'll see what they mean for your business. Jump over them to survive!
             </p>
             
             <div class="high-score-display" id="high-score-section">
                 <p>🏆 Your Best Score: <span id="high-score-value">0</span></p>
+            </div>
+
+            <!-- Industry Selector -->
+            <div class="form-group" style="margin: 20px 0;">
+                <label for="player-industry" style="display: block; margin-bottom: 10px; font-weight: 700; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px;">🏢 Your Industry</label>
+                <select id="player-industry" name="industry" aria-label="Select your industry" style="width: 100%; padding: 16px 20px; background: rgba(108, 92, 231, 0.1); border: 2px solid rgba(0, 255, 209, 0.2); border-radius: 14px; color: var(--text-light); font-size: 1rem; font-family: var(--font-body); font-weight: 500;">
+                    <option value="other">Select your industry...</option>
+                    <option value="banking">Banking & Financial Services</option>
+                    <option value="healthcare">Healthcare & Life Sciences</option>
+                    <option value="retail">Retail & Consumer Goods</option>
+                    <option value="other">Other</option>
+                </select>
             </div>
 
             <!-- Difficulty Selector -->
@@ -1317,19 +1367,36 @@
                 <strong>💡 Vault Tip:</strong> In real life, data disasters strike without warning. AutoRABIT Vault provides enterprise-grade backup & recovery for your Salesforce org—so you never lose critical data.
             </div>
             
-            <div class="share-section">
+            <!-- Share Info Form -->
+            <div class="share-info-section" id="share-info-section" style="background: rgba(0, 212, 255, 0.1); border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0;">
+                <h4 style="color: var(--primary); margin-bottom: 15px; font-size: 1rem;">📧 Enter your info to share results</h4>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <input type="text" id="player-name" name="name" placeholder="Your name" style="width: 100%; padding: 14px 18px; background: rgba(108, 92, 231, 0.1); border: 2px solid rgba(0, 255, 209, 0.2); border-radius: 12px; color: var(--text-light); font-size: 1rem; font-family: var(--font-body);">
+                    <p class="form-error" id="name-error" style="color: var(--danger); font-size: 0.8rem; margin-top: 6px; display: none;">Please enter your name</p>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <input type="email" id="player-email" name="email" placeholder="your@email.com" style="width: 100%; padding: 14px 18px; background: rgba(108, 92, 231, 0.1); border: 2px solid rgba(0, 255, 209, 0.2); border-radius: 12px; color: var(--text-light); font-size: 1rem; font-family: var(--font-body);">
+                    <p class="form-error" id="email-error" style="color: var(--danger); font-size: 0.8rem; margin-top: 6px; display: none;">Please enter a valid email address</p>
+                </div>
+                <button type="button" id="unlock-share-btn" class="btn btn-primary btn-full" style="padding: 14px 20px;">
+                    🔓 Unlock Sharing
+                </button>
+                <p id="share-unlocked-msg" style="display: none; color: var(--success); text-align: center; margin-top: 10px; font-weight: 600;">✓ Sharing unlocked!</p>
+            </div>
+            
+            <div class="share-section" id="share-section">
                 <h4>📢 Share Your Score</h4>
                 <div class="share-buttons">
-                    <button class="btn btn-social btn-x" id="share-x" aria-label="Share on X">
+                    <button class="btn btn-social btn-x" id="share-x" aria-label="Share on X" disabled style="opacity: 0.5; cursor: not-allowed;">
                         𝕏 Post
                     </button>
-                    <button class="btn btn-social btn-linkedin" id="share-linkedin" aria-label="Share on LinkedIn">
+                    <button class="btn btn-social btn-linkedin" id="share-linkedin" aria-label="Share on LinkedIn" disabled style="opacity: 0.5; cursor: not-allowed;">
                         in Share
                     </button>
-                    <button class="btn btn-social btn-email" id="email-results" aria-label="Email results to yourself">
+                    <button class="btn btn-social btn-email" id="email-results" aria-label="Email results to yourself" disabled style="opacity: 0.5; cursor: not-allowed;">
                         ✉️ Email Me
                     </button>
-                    <button class="btn btn-social btn-friend" id="email-friend" aria-label="Email to a friend">
+                    <button class="btn btn-social btn-friend" id="email-friend" aria-label="Email to a friend" disabled style="opacity: 0.5; cursor: not-allowed;">
                         👥 Send to Friend
                     </button>
                 </div>
@@ -1366,6 +1433,11 @@
         <!-- HUD -->
         <div class="hud" role="status" aria-live="polite">
             <div class="hud-item">
+                <div class="hud-lives" id="hud-lives">
+                    <span class="heart active">❤️</span>
+                    <span class="heart active">❤️</span>
+                    <span class="heart active">❤️</span>
+                </div>
                 <div class="hud-score">
                     Score: <span id="hud-score">0</span>
                 </div>
@@ -1699,13 +1771,13 @@
             hazards: ['Loan Overwrite', 'Compliance Breach', 'Audit Fail', 'Rate Sync Error', 'Document Leak'],
             collectibles: ['Secure Loan', 'Compliance Check', 'Audit Pass'],
             colors: {
-                primary: '#FFFFFF',
-                secondary: '#888888',
-                accent: '#FFFFFF',
-                hazard: '#FF4444',
-                bg: '#000000'
+                primary: '#00D4FF',
+                secondary: '#FF6B9D',
+                accent: '#FFD93D',
+                hazard: '#FF4757',
+                bg: '#1A1A2E'
             },
-            badge: { name: 'nCino Guardian', threshold: 500, icon: '🏦' },
+            badge: { name: 'Data Guardian', threshold: 300, icon: '🏦' },
             waves: ['Regulatory Fine Wave', 'Loan Default Storm', 'Compliance Audit Surge']
         },
         healthcare: {
@@ -1714,13 +1786,13 @@
             hazards: ['FlexCard Corruption', 'Process Fail', 'HIPAA Breach', 'Record Sync Error', 'PHI Exposure'],
             collectibles: ['OmniScript', 'FlexCard', 'DataRaptor'],
             colors: {
-                primary: '#FFFFFF',
-                secondary: '#888888',
-                accent: '#FFFFFF',
-                hazard: '#FF4444',
-                bg: '#000000'
+                primary: '#00D4FF',
+                secondary: '#FF6B9D',
+                accent: '#FFD93D',
+                hazard: '#FF4757',
+                bg: '#1A1A2E'
             },
-            badge: { name: 'OmniStudio Healer', threshold: 500, icon: '⚕️' },
+            badge: { name: 'Data Guardian', threshold: 300, icon: '⚕️' },
             waves: ['UI Glitch Swarm', 'Integration Crash', 'Data Flow Disruption']
         },
         retail: {
@@ -1729,13 +1801,13 @@
             hazards: ['Cart Corruption', 'Order Sync Fail', 'Inventory Wipe', 'Price Override', 'Customer Loss'],
             collectibles: ['Order Data', 'Customer Record', 'Product Sync'],
             colors: {
-                primary: '#FFFFFF',
-                secondary: '#888888',
-                accent: '#FFFFFF',
-                hazard: '#FF4444',
-                bg: '#000000'
+                primary: '#00D4FF',
+                secondary: '#FF6B9D',
+                accent: '#FFD93D',
+                hazard: '#FF4757',
+                bg: '#1A1A2E'
             },
-            badge: { name: 'Commerce Champion', threshold: 500, icon: '🛒' },
+            badge: { name: 'Data Guardian', threshold: 300, icon: '🛒' },
             waves: ['Flash Sale Crash', 'Inventory Chaos', 'Cart Abandonment Storm']
         },
         other: {
@@ -1744,13 +1816,13 @@
             hazards: ['Metadata Loss', 'API Limit Hit', 'Sandbox Wipe', 'Config Corrupt', 'Deploy Fail'],
             collectibles: ['Sandbox Orb', 'Metadata Pack', 'Config Backup'],
             colors: {
-                primary: '#FFFFFF',
-                secondary: '#888888',
-                accent: '#FFFFFF',
-                hazard: '#FF4444',
-                bg: '#000000'
+                primary: '#00D4FF',
+                secondary: '#FF6B9D',
+                accent: '#FFD93D',
+                hazard: '#FF4757',
+                bg: '#1A1A2E'
             },
-            badge: { name: 'Salesforce Survivor', threshold: 500, icon: '☁️' },
+            badge: { name: 'Data Guardian', threshold: 300, icon: '☁️' },
             waves: ['Ransomware Attack', 'Mass Delete Storm', 'Integration Nightmare']
         }
     };
@@ -1776,7 +1848,14 @@
         currentWave: null,
         soundEnabled: true,
         theme: THEMES.other,
-        userData: { name: '', email: '', industry: '' },
+        userData: { name: '', email: '', industry: 'other' },
+        shareUnlocked: false,
+        // Lives system
+        lives: 3,
+        maxLives: 3,
+        invincible: false,
+        invincibleEndTime: 0,
+        screenShake: 0,
         // Combo system
         combo: 0,
         maxCombo: 0,
@@ -1803,18 +1882,15 @@
     // DOM ELEMENTS
     // ==========================================
     const elements = {
-        registrationModal: document.getElementById('registration-modal'),
         startModal: document.getElementById('start-modal'),
         endModal: document.getElementById('end-modal'),
         gameContainer: document.getElementById('game-container'),
         canvas: document.getElementById('gameCanvas'),
-        registrationForm: document.getElementById('registration-form'),
         playerName: document.getElementById('player-name'),
         playerEmail: document.getElementById('player-email'),
         playerIndustry: document.getElementById('player-industry'),
         nameError: document.getElementById('name-error'),
         emailError: document.getElementById('email-error'),
-        welcomeText: document.getElementById('welcome-text'),
         industryIntro: document.getElementById('industry-intro'),
         highScoreValue: document.getElementById('high-score-value'),
         startGameBtn: document.getElementById('start-game-btn'),
@@ -1834,6 +1910,7 @@
         friendCancel: document.getElementById('friend-cancel'),
         friendSend: document.getElementById('friend-send'),
         hudScore: document.getElementById('hud-score'),
+        hudLives: document.getElementById('hud-lives'),
         pauseBtn: document.getElementById('pause-btn'),
         muteBtn: document.getElementById('mute-btn'),
         pauseOverlay: document.getElementById('pause-overlay'),
@@ -1847,7 +1924,12 @@
         modeToggle: document.getElementById('mode-toggle'),
         arcadeModeBtn: document.getElementById('arcade-mode-btn'),
         learningModeBtn: document.getElementById('learning-mode-btn'),
-        modeDescription: document.getElementById('mode-description')
+        modeDescription: document.getElementById('mode-description'),
+        // Share unlock elements
+        shareInfoSection: document.getElementById('share-info-section'),
+        unlockShareBtn: document.getElementById('unlock-share-btn'),
+        shareUnlockedMsg: document.getElementById('share-unlocked-msg'),
+        shareSection: document.getElementById('share-section')
     };
 
     const ctx = elements.canvas.getContext('2d');
@@ -2035,11 +2117,22 @@
 
         draw(ctx) {
             const theme = gameState.theme;
+            const runCycle = Math.sin(this.frame * Math.PI / 2);
+            const bobOffset = Math.abs(runCycle) * 2;
+            const armSwing = runCycle * 8;
+            const coffeeWobble = this.isJumping ? Math.sin(Date.now() / 80) * 4 : runCycle * 2;
+            
+            // Invincibility flash effect
+            if (gameState.invincible) {
+                const flash = Math.sin(Date.now() / 50);
+                if (flash > 0.3) {
+                    ctx.globalAlpha = 0.5;
+                }
+            }
             
             // Draw shield effect if active
             if (gameState.shieldActive) {
                 ctx.save();
-                // Outer shield ring
                 const shieldPulse = Math.sin(Date.now() / 100) * 5 + 45;
                 ctx.beginPath();
                 ctx.arc(this.x + this.width/2, this.y + this.height/2, shieldPulse, 0, Math.PI * 2);
@@ -2049,135 +2142,159 @@
                 ctx.shadowBlur = 30;
                 ctx.stroke();
                 
-                // Inner shield fill
                 ctx.beginPath();
                 ctx.arc(this.x + this.width/2, this.y + this.height/2, this.width * 0.75, 0, Math.PI * 2);
                 ctx.fillStyle = `${theme.colors.primary}22`;
                 ctx.fill();
-                
-                // Hexagon pattern
-                ctx.strokeStyle = `${theme.colors.primary}44`;
-                ctx.lineWidth = 1;
-                for (let i = 0; i < 6; i++) {
-                    const angle = (i * Math.PI / 3) + Date.now() / 2000;
-                    const x1 = this.x + this.width/2 + Math.cos(angle) * 35;
-                    const y1 = this.y + this.height/2 + Math.sin(angle) * 35;
-                    ctx.beginPath();
-                    ctx.moveTo(this.x + this.width/2, this.y + this.height/2);
-                    ctx.lineTo(x1, y1);
-                    ctx.stroke();
-                }
                 ctx.restore();
             }
 
-            // Bot glow effect
             ctx.save();
-            ctx.shadowColor = theme.colors.primary;
-            ctx.shadowBlur = 15;
             
-            // Bot body (rounded)
-            const bodyGrad = ctx.createLinearGradient(this.x, this.y, this.x + this.width, this.y + this.height);
-            bodyGrad.addColorStop(0, theme.colors.primary);
-            bodyGrad.addColorStop(1, theme.colors.secondary);
-            ctx.fillStyle = bodyGrad;
-            
-            // Main body
+            // Character shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
             ctx.beginPath();
-            ctx.roundRect(this.x + 8, this.y + 18, this.width - 16, this.height - 30, 8);
-            ctx.fill();
-
-            // Bot head (with visor)
-            ctx.fillStyle = theme.colors.secondary;
-            ctx.beginPath();
-            ctx.roundRect(this.x + 8, this.y + 2, this.width - 16, 22, [8, 8, 0, 0]);
-            ctx.fill();
-
-            // Visor (eyes area)
-            ctx.fillStyle = '#0D0221';
-            ctx.beginPath();
-            ctx.roundRect(this.x + 12, this.y + 6, this.width - 24, 14, 4);
-            ctx.fill();
-
-            // Eyes (animated, glowing)
-            const eyeOffset = Math.sin(this.animTimer * 0.3) * 2;
-            const eyeGlow = ctx.createRadialGradient(
-                this.x + 19 + eyeOffset, this.y + 12, 0,
-                this.x + 19 + eyeOffset, this.y + 12, 8
-            );
-            eyeGlow.addColorStop(0, '#fff');
-            eyeGlow.addColorStop(0.5, theme.colors.primary);
-            eyeGlow.addColorStop(1, 'transparent');
-            ctx.fillStyle = eyeGlow;
-            ctx.beginPath();
-            ctx.arc(this.x + 19 + eyeOffset, this.y + 12, 5, 0, Math.PI * 2);
+            ctx.ellipse(this.x + this.width/2, this.y + this.height + 2, 18, 6, 0, 0, Math.PI * 2);
             ctx.fill();
             
-            const eyeGlow2 = ctx.createRadialGradient(
-                this.x + 32 + eyeOffset, this.y + 12, 0,
-                this.x + 32 + eyeOffset, this.y + 12, 8
-            );
-            eyeGlow2.addColorStop(0, '#fff');
-            eyeGlow2.addColorStop(0.5, theme.colors.accent);
-            eyeGlow2.addColorStop(1, 'transparent');
-            ctx.fillStyle = eyeGlow2;
+            // === LEGS (Dark pants) ===
+            ctx.fillStyle = '#2C3E50';
+            // Left leg
+            const leftLegY = this.y + 38 - bobOffset;
             ctx.beginPath();
-            ctx.arc(this.x + 32 + eyeOffset, this.y + 12, 5, 0, Math.PI * 2);
+            ctx.roundRect(this.x + 15, leftLegY + runCycle * 5, 8, 22 - Math.max(0, runCycle * 3), 2);
             ctx.fill();
-
-            // Running legs animation
-            const legOffset = Math.sin(this.frame * Math.PI / 2) * 10;
-            ctx.fillStyle = theme.colors.primary;
+            // Right leg
             ctx.beginPath();
-            ctx.roundRect(this.x + 12, this.y + this.height - 18 + legOffset, 10, 18 - Math.max(0, legOffset), 3);
+            ctx.roundRect(this.x + 27, leftLegY - runCycle * 5, 8, 22 + Math.min(0, runCycle * 3), 2);
+            ctx.fill();
+            
+            // === SHOES ===
+            ctx.fillStyle = '#1A1A2E';
+            ctx.beginPath();
+            ctx.roundRect(this.x + 13, this.y + this.height - 8 + runCycle * 5, 12, 6, 2);
             ctx.fill();
             ctx.beginPath();
-            ctx.roundRect(this.x + 28, this.y + this.height - 18 - legOffset, 10, 18 + Math.min(0, legOffset), 3);
+            ctx.roundRect(this.x + 25, this.y + this.height - 8 - runCycle * 5, 12, 6, 2);
             ctx.fill();
-
-            // Antenna with energy orb
-            ctx.strokeStyle = theme.colors.accent;
-            ctx.lineWidth = 3;
+            
+            // === TORSO (Blue shirt) ===
+            const shirtGrad = ctx.createLinearGradient(this.x + 10, this.y + 18, this.x + 40, this.y + 45);
+            shirtGrad.addColorStop(0, '#3498DB');
+            shirtGrad.addColorStop(1, '#2980B9');
+            ctx.fillStyle = shirtGrad;
             ctx.beginPath();
-            ctx.moveTo(this.x + this.width/2, this.y + 2);
-            ctx.lineTo(this.x + this.width/2, this.y - 12);
+            ctx.roundRect(this.x + 10, this.y + 18 - bobOffset, 30, 24, 3);
+            ctx.fill();
+            
+            // === TIE ===
+            ctx.fillStyle = '#E74C3C';
+            ctx.beginPath();
+            ctx.moveTo(this.x + 25, this.y + 18 - bobOffset);
+            ctx.lineTo(this.x + 28, this.y + 22 - bobOffset);
+            ctx.lineTo(this.x + 25, this.y + 38 - bobOffset);
+            ctx.lineTo(this.x + 22, this.y + 22 - bobOffset);
+            ctx.closePath();
+            ctx.fill();
+            
+            // === ARMS ===
+            ctx.fillStyle = '#3498DB';
+            // Back arm (swinging)
+            ctx.beginPath();
+            ctx.roundRect(this.x + 8, this.y + 20 - bobOffset - armSwing, 6, 16, 2);
+            ctx.fill();
+            
+            // === COFFEE CUP (held in front arm) ===
+            const cupX = this.x + 38 + coffeeWobble;
+            const cupY = this.y + 24 - bobOffset + armSwing * 0.5;
+            
+            // Front arm holding coffee
+            ctx.fillStyle = '#F5D0C5'; // Skin color
+            ctx.beginPath();
+            ctx.roundRect(this.x + 36, this.y + 20 - bobOffset + armSwing * 0.3, 6, 12, 2);
+            ctx.fill();
+            
+            // Coffee cup body
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.roundRect(cupX, cupY, 10, 14, 2);
+            ctx.fill();
+            
+            // Cup sleeve
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(cupX + 1, cupY + 4, 8, 6);
+            
+            // Coffee inside
+            ctx.fillStyle = '#5D4037';
+            ctx.beginPath();
+            ctx.ellipse(cupX + 5, cupY + 2, 4, 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Steam from coffee
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.lineCap = 'round';
+            for (let i = 0; i < 3; i++) {
+                const steamOffset = (Date.now() / 200 + i * 2) % 10;
+                const steamX = cupX + 3 + i * 2;
+                ctx.beginPath();
+                ctx.moveTo(steamX, cupY - steamOffset);
+                ctx.quadraticCurveTo(steamX + Math.sin(steamOffset) * 3, cupY - steamOffset - 4, steamX, cupY - steamOffset - 8);
+                ctx.stroke();
+            }
+            
+            // === HEAD ===
+            // Neck
+            ctx.fillStyle = '#F5D0C5';
+            ctx.fillRect(this.x + 21, this.y + 12 - bobOffset, 8, 8);
+            
+            // Head shape
+            ctx.fillStyle = '#F5D0C5';
+            ctx.beginPath();
+            ctx.roundRect(this.x + 14, this.y - 2 - bobOffset, 22, 18, 6);
+            ctx.fill();
+            
+            // Hair
+            ctx.fillStyle = '#4A3728';
+            ctx.beginPath();
+            ctx.roundRect(this.x + 13, this.y - 4 - bobOffset, 24, 10, [6, 6, 0, 0]);
+            ctx.fill();
+            // Hair side
+            ctx.fillRect(this.x + 13, this.y + 2 - bobOffset, 3, 6);
+            ctx.fillRect(this.x + 34, this.y + 2 - bobOffset, 3, 6);
+            
+            // Eyes
+            ctx.fillStyle = '#2C3E50';
+            ctx.beginPath();
+            ctx.arc(this.x + 20, this.y + 6 - bobOffset, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(this.x + 30, this.y + 6 - bobOffset, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Smile
+            ctx.strokeStyle = '#C0392B';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(this.x + 25, this.y + 8 - bobOffset, 5, 0.2, Math.PI - 0.2);
             ctx.stroke();
             
-            // Antenna orb (pulsing)
-            const orbPulse = Math.sin(Date.now() / 150) * 2 + 5;
-            const orbGrad = ctx.createRadialGradient(
-                this.x + this.width/2, this.y - 14, 0,
-                this.x + this.width/2, this.y - 14, orbPulse + 3
-            );
-            orbGrad.addColorStop(0, '#fff');
-            orbGrad.addColorStop(0.4, theme.colors.accent);
-            orbGrad.addColorStop(1, 'transparent');
-            ctx.fillStyle = orbGrad;
-            ctx.beginPath();
-            ctx.arc(this.x + this.width/2, this.y - 14, orbPulse, 0, Math.PI * 2);
-            ctx.fill();
-            
             ctx.restore();
+            
+            // Reset alpha after invincibility flash
+            ctx.globalAlpha = 1;
 
-            // Jet trail when jumping
+            // Coffee splash trail when jumping
             if (this.isJumping && this.velocityY < 0) {
                 ctx.save();
-                ctx.globalAlpha = 0.6;
-                for (let i = 0; i < 5; i++) {
-                    ctx.fillStyle = theme.colors.primary;
-                    ctx.globalAlpha = 0.5 - i * 0.1;
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillStyle = '#8B4513';
+                    ctx.globalAlpha = 0.4 - i * 0.1;
                     ctx.beginPath();
                     ctx.arc(
-                        this.x + 15 + Math.random() * 5, 
-                        this.y + this.height + i * 8 + Math.random() * 3,
-                        4 - i * 0.5,
-                        0, Math.PI * 2
-                    );
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(
-                        this.x + 35 + Math.random() * 5, 
-                        this.y + this.height + i * 8 + Math.random() * 3,
-                        4 - i * 0.5,
+                        cupX + 5 + (Math.random() - 0.5) * 8,
+                        cupY + 14 + i * 6 + Math.random() * 4,
+                        3 - i * 0.5,
                         0, Math.PI * 2
                     );
                     ctx.fill();
@@ -2891,6 +3008,9 @@
         gameState.threatsAvoidedList = [];
         gameState.protectedFlash = null;
         
+        // Reset lives system
+        resetLives();
+        
         // Reset learning mode state
         gameState.learningPaused = false;
         gameState.currentLearningHazard = null;
@@ -3095,6 +3215,17 @@
     function update() {
         if (!gameState.isRunning || gameState.isPaused) return;
 
+        // Update invincibility
+        if (gameState.invincible && Date.now() > gameState.invincibleEndTime) {
+            gameState.invincible = false;
+        }
+        
+        // Decay screen shake
+        if (gameState.screenShake > 0) {
+            gameState.screenShake *= 0.9;
+            if (gameState.screenShake < 0.5) gameState.screenShake = 0;
+        }
+
         // Learning mode: check for hazards approaching to trigger pause
         if (gameState.learningMode && !gameState.learningPaused) {
             checkLearningModeHazards();
@@ -3176,13 +3307,17 @@
         // Hazard collision
         for (const hazard of gameState.hazards) {
             if (checkCollision(playerBounds, hazard.getBounds())) {
-                if (!gameState.shieldActive) {
-                    gameOver();
-                    return;
-                } else {
+                if (gameState.shieldActive) {
                     // Destroy hazard with shield
                     spawnParticles(hazard.x, hazard.y, gameState.theme.colors.hazard, 15);
                     hazard.x = -100; // Move off screen
+                } else if (!gameState.invincible) {
+                    // Lose a life
+                    loseLife(hazard);
+                    if (gameState.lives <= 0) {
+                        gameOver();
+                        return;
+                    }
                 }
             }
         }
@@ -3209,11 +3344,19 @@
                 gameState.score += points;
                 elements.hudScore.textContent = gameState.score;
                 playSound('collect');
-                spawnParticles(orb.x, orb.y, gameState.theme.colors.accent, 8 + gameState.combo);
+                
+                // Enhanced collection effect
+                spawnParticles(orb.x, orb.y, gameState.theme.colors.accent, 10 + gameState.combo * 2);
+                
+                // Add ring burst effect
+                gameState.particles.push(new RingBurst(orb.x, orb.y, gameState.theme.colors.accent));
+                
+                // Show points earned
+                gameState.particles.push(new FloatingText(orb.x, orb.y - 10, `+${points}`, '#00FF88'));
                 
                 // Show combo popup
                 if (gameState.combo > 1) {
-                    gameState.particles.push(new FloatingText(orb.x, orb.y - 20, `${gameState.combo}x COMBO!`, gameState.theme.colors.accent));
+                    gameState.particles.push(new FloatingText(orb.x, orb.y - 30, `${gameState.combo}x COMBO!`, gameState.theme.colors.secondary));
                 }
             }
         }
@@ -3248,21 +3391,59 @@
     function draw() {
         const theme = gameState.theme;
         
-        // Clear canvas with black background
-        ctx.fillStyle = '#000000';
+        // Apply screen shake
+        ctx.save();
+        if (gameState.screenShake > 0) {
+            const shakeX = (Math.random() - 0.5) * gameState.screenShake * 2;
+            const shakeY = (Math.random() - 0.5) * gameState.screenShake * 2;
+            ctx.translate(shakeX, shakeY);
+        }
+        
+        // Clear canvas with gradient background
+        const bgGradient = ctx.createLinearGradient(0, 0, 0, CONFIG.CANVAS_HEIGHT);
+        bgGradient.addColorStop(0, '#0F0F23');
+        bgGradient.addColorStop(0.4, '#1A1A2E');
+        bgGradient.addColorStop(1, '#16213E');
+        ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
+
+        // Draw city skyline silhouette
+        ctx.save();
+        const skylineY = CONFIG.CANVAS_HEIGHT * 0.35;
+        ctx.fillStyle = 'rgba(22, 33, 62, 0.8)';
+        const buildings = [
+            { x: 50, w: 40, h: 80 }, { x: 100, w: 30, h: 120 }, { x: 140, w: 50, h: 90 },
+            { x: 200, w: 35, h: 140 }, { x: 250, w: 45, h: 70 }, { x: 310, w: 60, h: 110 },
+            { x: 380, w: 40, h: 150 }, { x: 430, w: 55, h: 85 }, { x: 500, w: 35, h: 130 },
+            { x: 550, w: 50, h: 100 }, { x: 620, w: 40, h: 160 }, { x: 680, w: 55, h: 95 },
+            { x: 750, w: 45, h: 125 }, { x: 810, w: 60, h: 80 }, { x: 870, w: 35, h: 110 }
+        ];
+        buildings.forEach(b => {
+            ctx.fillRect(b.x, skylineY - b.h + 50, b.w, b.h);
+            // Add window lights
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.3)';
+            for (let wy = skylineY - b.h + 60; wy < skylineY + 40; wy += 15) {
+                for (let wx = b.x + 5; wx < b.x + b.w - 5; wx += 12) {
+                    if (Math.random() > 0.5) {
+                        ctx.fillRect(wx, wy, 6, 8);
+                    }
+                }
+            }
+            ctx.fillStyle = 'rgba(22, 33, 62, 0.8)';
+        });
+        ctx.restore();
 
         // Draw background elements
         gameState.bgElements.forEach(b => b.draw(ctx));
 
-        // Draw simple grid (perspective)
+        // Draw neon grid (perspective)
         ctx.save();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.strokeStyle = 'rgba(0, 212, 255, 0.15)';
         ctx.lineWidth = 1;
         const gridSpacing = 60;
         const horizon = CONFIG.CANVAS_HEIGHT * 0.3;
         
-        // Vertical lines
+        // Vertical lines with cyan glow
         for (let x = 0; x < CONFIG.CANVAS_WIDTH; x += gridSpacing) {
             ctx.beginPath();
             ctx.moveTo(x, horizon);
@@ -3278,15 +3459,20 @@
         }
         ctx.restore();
 
-        // Draw ground
+        // Draw ground with gradient
         const groundY = CONFIG.CANVAS_HEIGHT - CONFIG.GROUND_HEIGHT;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        const groundGrad = ctx.createLinearGradient(0, groundY, 0, CONFIG.CANVAS_HEIGHT);
+        groundGrad.addColorStop(0, 'rgba(0, 212, 255, 0.1)');
+        groundGrad.addColorStop(1, 'rgba(22, 33, 62, 0.8)');
+        ctx.fillStyle = groundGrad;
         ctx.fillRect(0, groundY, CONFIG.CANVAS_WIDTH, CONFIG.GROUND_HEIGHT);
 
-        // Ground line
+        // Ground line with neon glow
         ctx.save();
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#00D4FF';
+        ctx.shadowColor = '#00D4FF';
+        ctx.shadowBlur = 10;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(0, groundY);
         ctx.lineTo(CONFIG.CANVAS_WIDTH, groundY);
@@ -3294,14 +3480,33 @@
         ctx.restore();
 
         // Draw running track lines
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255, 107, 157, 0.3)';
+        ctx.lineWidth = 2;
         ctx.setLineDash([20, 40]);
         ctx.beginPath();
         ctx.moveTo(0, groundY + 20);
         ctx.lineTo(CONFIG.CANVAS_WIDTH, groundY + 20);
         ctx.stroke();
         ctx.setLineDash([]);
+        
+        // Draw speed lines (intensity based on game speed)
+        const speedIntensity = Math.min((gameState.speed - 3) / 10, 1);
+        if (speedIntensity > 0.1) {
+            ctx.save();
+            ctx.strokeStyle = `rgba(0, 212, 255, ${speedIntensity * 0.3})`;
+            ctx.lineWidth = 2;
+            const numLines = Math.floor(speedIntensity * 8) + 2;
+            for (let i = 0; i < numLines; i++) {
+                const lineY = 80 + (i * 50) + Math.sin(Date.now() / 200 + i) * 20;
+                const lineLength = 40 + speedIntensity * 60;
+                const lineX = (Date.now() / 3 + i * 100) % (CONFIG.CANVAS_WIDTH + lineLength) - lineLength;
+                ctx.beginPath();
+                ctx.moveTo(lineX, lineY);
+                ctx.lineTo(lineX + lineLength, lineY);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
 
         // Draw particles
         gameState.particles.forEach(p => p.draw(ctx));
@@ -3357,6 +3562,16 @@
 
         // Draw mode indicator
         drawModeIndicator(ctx);
+        
+        // Restore from screen shake
+        ctx.restore();
+        
+        // Draw damage flash overlay (outside of screen shake)
+        if (gameState.invincible) {
+            const flashAlpha = Math.sin(Date.now() / 50) * 0.15 + 0.1;
+            ctx.fillStyle = `rgba(255, 71, 87, ${flashAlpha})`;
+            ctx.fillRect(0, 0, CONFIG.CANVAS_WIDTH, CONFIG.CANVAS_HEIGHT);
+        }
     }
 
     function drawHazardPreviewLane(ctx) {
@@ -3598,6 +3813,144 @@
         }
     }
 
+    // ==========================================
+    // LIVES SYSTEM
+    // ==========================================
+    function loseLife(hazard) {
+        gameState.lives--;
+        gameState.invincible = true;
+        gameState.invincibleEndTime = Date.now() + 2000; // 2 seconds invincibility
+        gameState.screenShake = 15;
+        
+        // Update hearts display
+        updateHeartsDisplay();
+        
+        // Play hit sound
+        playSound('hit');
+        
+        // Spawn damage particles (coffee splash!)
+        const player = gameState.player;
+        for (let i = 0; i < 12; i++) {
+            gameState.particles.push(new CoffeeSplash(
+                player.x + player.width / 2,
+                player.y + player.height / 2
+            ));
+        }
+        
+        // Show damage text
+        gameState.particles.push(new FloatingText(
+            player.x + player.width / 2,
+            player.y - 20,
+            gameState.lives > 0 ? `OUCH! ${gameState.lives} ❤️ left` : 'NO MORE COFFEE!',
+            '#FF4757'
+        ));
+        
+        // Remove the hazard that hit us
+        hazard.x = -100;
+    }
+
+    function updateHeartsDisplay() {
+        const hearts = elements.hudLives.querySelectorAll('.heart');
+        hearts.forEach((heart, index) => {
+            if (index < gameState.lives) {
+                heart.classList.add('active');
+                heart.classList.remove('lost');
+            } else {
+                heart.classList.remove('active');
+                heart.classList.add('lost');
+                // Trigger damage animation on the heart that was just lost
+                if (index === gameState.lives) {
+                    heart.classList.add('damage');
+                    setTimeout(() => heart.classList.remove('damage'), 500);
+                }
+            }
+        });
+    }
+
+    function resetLives() {
+        gameState.lives = gameState.maxLives;
+        gameState.invincible = false;
+        gameState.invincibleEndTime = 0;
+        gameState.screenShake = 0;
+        
+        // Reset hearts display
+        const hearts = elements.hudLives.querySelectorAll('.heart');
+        hearts.forEach(heart => {
+            heart.classList.add('active');
+            heart.classList.remove('lost', 'damage');
+        });
+    }
+
+    // Coffee splash particle class
+    class CoffeeSplash {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 12;
+            this.vy = Math.random() * -8 - 4;
+            this.size = Math.random() * 6 + 3;
+            this.life = 1;
+            this.gravity = 0.3;
+            this.color = Math.random() > 0.3 ? '#8B4513' : '#D2691E'; // Brown coffee colors
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += this.gravity;
+            this.life -= 0.025;
+            this.size *= 0.98;
+        }
+
+        draw(ctx) {
+            if (this.life <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        isOffScreen() {
+            return this.life <= 0 || this.y > CONFIG.CANVAS_HEIGHT + 50;
+        }
+    }
+
+    // Ring burst effect for collecting orbs
+    class RingBurst {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.radius = 5;
+            this.maxRadius = 40;
+            this.life = 1;
+        }
+
+        update() {
+            this.radius += 3;
+            this.life = 1 - (this.radius / this.maxRadius);
+        }
+
+        draw(ctx) {
+            if (this.life <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = this.life * 0.6;
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        isOffScreen() {
+            return this.radius >= this.maxRadius;
+        }
+    }
+
     function gameOver() {
         gameState.isRunning = false;
         playSound('hit');
@@ -3618,79 +3971,196 @@
     // ==========================================
     // SCREEN MANAGEMENT
     // ==========================================
-    function showRegistrationScreen() {
-        const savedUser = loadUserData();
-        if (savedUser) {
-            elements.playerName.value = savedUser.name || '';
-            elements.playerEmail.value = savedUser.email || '';
-            elements.playerIndustry.value = savedUser.industry || '';
-        }
-        
-        elements.registrationModal.classList.remove('hidden');
-        elements.startModal.classList.add('hidden');
-        elements.endModal.classList.add('hidden');
-        elements.gameContainer.classList.add('hidden');
-    }
-
     function showStartScreen() {
-        elements.registrationModal.classList.add('hidden');
         elements.startModal.classList.remove('hidden');
         elements.endModal.classList.add('hidden');
         elements.gameContainer.classList.add('hidden');
 
-        // Update welcome text
-        elements.welcomeText.textContent = `Run, ${gameState.userData.name}!`;
+        // Load saved industry preference
+        const savedUser = loadUserData();
+        if (savedUser && savedUser.industry) {
+            elements.playerIndustry.value = savedUser.industry;
+            gameState.userData.industry = savedUser.industry;
+            gameState.theme = THEMES[savedUser.industry] || THEMES.other;
+        }
+
+        // Update industry intro based on current theme
         elements.industryIntro.innerHTML = `<strong>${gameState.theme.name}:</strong> ${gameState.theme.greeting}`;
         elements.highScoreValue.textContent = loadHighScore();
     }
 
     function showGameScreen() {
-        elements.registrationModal.classList.add('hidden');
         elements.startModal.classList.add('hidden');
         elements.endModal.classList.add('hidden');
         elements.gameContainer.classList.remove('hidden');
+
+        // Set industry/theme from selector before starting
+        const selectedIndustry = elements.playerIndustry.value || 'other';
+        gameState.userData.industry = selectedIndustry;
+        gameState.theme = THEMES[selectedIndustry] || THEMES.other;
 
         initGame();
         gameLoop();
     }
 
     function showEndScreen(isNewHighScore) {
-        elements.registrationModal.classList.add('hidden');
         elements.startModal.classList.add('hidden');
         elements.endModal.classList.remove('hidden');
         elements.gameContainer.classList.add('hidden');
 
         const diffName = gameState.difficultySettings.name;
         const diffIcon = gameState.difficultySettings.icon;
-        elements.endMessage.textContent = `${gameState.userData.name}, ${isNewHighScore ? 'New High Score!' : 'great run!'} ${diffIcon}`;
+        elements.endMessage.textContent = `${isNewHighScore ? 'New High Score!' : 'Great run!'} ${diffIcon}`;
         elements.finalScore.textContent = gameState.score;
 
-        // Check for badge (with multiple tiers)
+        // Check for badge (Intern / Pro / Expert tiers)
+        // Intern: 0-299 (no badge, encouragement message)
+        // Pro: 300-699 (badge earned)
+        // Expert: 700+ (top badge)
         const badge = gameState.theme.badge;
         let earnedBadge = null;
+        let tierMessage = '';
         
-        if (gameState.score >= 2000) {
-            earnedBadge = { name: `${badge.icon} LEGENDARY ${badge.name}`, desc: `Legendary score of 2000+ in ${gameState.theme.name}!` };
-        } else if (gameState.score >= 1000) {
-            earnedBadge = { name: `${badge.icon} Elite ${badge.name}`, desc: `Elite score of 1000+ in ${gameState.theme.name}!` };
-        } else if (gameState.score >= badge.threshold) {
-            earnedBadge = { name: `${badge.icon} ${badge.name}`, desc: `Scored ${badge.threshold}+ in ${gameState.theme.name}!` };
+        if (gameState.score >= 700) {
+            earnedBadge = { 
+                name: `🏆 Expert ${badge.name}`, 
+                desc: `Outstanding! You're a data protection master!`,
+                tier: 'expert'
+            };
+            tierMessage = '🎉 EXPERT TIER ACHIEVED!';
+        } else if (gameState.score >= 300) {
+            earnedBadge = { 
+                name: `⭐ Pro ${badge.name}`, 
+                desc: `Great job! You know your data threats!`,
+                tier: 'pro'
+            };
+            tierMessage = '👏 PRO TIER ACHIEVED!';
         }
+        // Under 300 = Intern tier, no badge
 
         if (earnedBadge) {
             elements.badgeSection.classList.remove('hidden');
             elements.badgeTitle.textContent = earnedBadge.name;
             elements.badgeDescription.textContent = earnedBadge.desc;
+            
+            // Add tier celebration effect
+            elements.badgeSection.setAttribute('data-tier', earnedBadge.tier);
         } else {
-            elements.badgeSection.classList.add('hidden');
+            // Intern tier - show encouragement instead
+            elements.badgeSection.classList.remove('hidden');
+            elements.badgeTitle.textContent = '📚 Intern Level';
+            elements.badgeDescription.textContent = `Score 300+ to earn Pro badge! Keep practicing!`;
+            elements.badgeSection.setAttribute('data-tier', 'intern');
         }
 
         // Update threats avoided section
         updateThreatsAvoidedSection();
 
-        // Update CTA link
+        // Update CTA link (without email if not provided yet)
+        const ctaUrl = `https://autorabit.com/vault-free-trial?source=recovery-runner&industry=${encodeURIComponent(gameState.userData.industry)}&score=${gameState.score}&threats_avoided=${gameState.threatsAvoided}`;
+        elements.ctaButton.href = ctaUrl;
+
+        // Reset share form state for new game
+        resetShareForm();
+    }
+
+    function resetShareForm() {
+        // Reset the share unlock state
+        gameState.shareUnlocked = false;
+        
+        // Clear the form fields
+        elements.playerName.value = '';
+        elements.playerEmail.value = '';
+        elements.nameError.style.display = 'none';
+        elements.emailError.style.display = 'none';
+        
+        // Show the form, hide success message
+        elements.shareInfoSection.style.display = 'block';
+        elements.unlockShareBtn.style.display = 'block';
+        elements.shareUnlockedMsg.style.display = 'none';
+        
+        // Disable share buttons
+        disableShareButtons();
+    }
+
+    function disableShareButtons() {
+        elements.shareX.disabled = true;
+        elements.shareX.style.opacity = '0.5';
+        elements.shareX.style.cursor = 'not-allowed';
+        
+        elements.shareLinkedIn.disabled = true;
+        elements.shareLinkedIn.style.opacity = '0.5';
+        elements.shareLinkedIn.style.cursor = 'not-allowed';
+        
+        elements.emailResults.disabled = true;
+        elements.emailResults.style.opacity = '0.5';
+        elements.emailResults.style.cursor = 'not-allowed';
+        
+        elements.emailFriend.disabled = true;
+        elements.emailFriend.style.opacity = '0.5';
+        elements.emailFriend.style.cursor = 'not-allowed';
+    }
+
+    function enableShareButtons() {
+        elements.shareX.disabled = false;
+        elements.shareX.style.opacity = '1';
+        elements.shareX.style.cursor = 'pointer';
+        
+        elements.shareLinkedIn.disabled = false;
+        elements.shareLinkedIn.style.opacity = '1';
+        elements.shareLinkedIn.style.cursor = 'pointer';
+        
+        elements.emailResults.disabled = false;
+        elements.emailResults.style.opacity = '1';
+        elements.emailResults.style.cursor = 'pointer';
+        
+        elements.emailFriend.disabled = false;
+        elements.emailFriend.style.opacity = '1';
+        elements.emailFriend.style.cursor = 'pointer';
+    }
+
+    function unlockSharing() {
+        let isValid = true;
+
+        // Validate name
+        if (!elements.playerName.value.trim()) {
+            elements.nameError.style.display = 'block';
+            isValid = false;
+        } else {
+            elements.nameError.style.display = 'none';
+        }
+
+        // Validate email
+        if (!validateEmail(elements.playerEmail.value)) {
+            elements.emailError.style.display = 'block';
+            isValid = false;
+        } else {
+            elements.emailError.style.display = 'none';
+        }
+
+        if (!isValid) return;
+
+        // Save user data
+        gameState.userData.name = elements.playerName.value.trim();
+        gameState.userData.email = elements.playerEmail.value.trim();
+        gameState.shareUnlocked = true;
+
+        // Save to localStorage
+        saveUserData(gameState.userData);
+
+        // Update CTA link with email
         const ctaUrl = `https://autorabit.com/vault-free-trial?source=recovery-runner&email=${encodeURIComponent(gameState.userData.email)}&industry=${encodeURIComponent(gameState.userData.industry)}&score=${gameState.score}&threats_avoided=${gameState.threatsAvoided}`;
         elements.ctaButton.href = ctaUrl;
+
+        // Show success and enable sharing
+        elements.unlockShareBtn.style.display = 'none';
+        elements.shareUnlockedMsg.style.display = 'block';
+        enableShareButtons();
+
+        trackEvent('share_unlocked', { 
+            score: gameState.score,
+            industry: gameState.userData.industry
+        });
     }
 
     function updateThreatsAvoidedSection() {
@@ -3747,46 +4217,35 @@
     // ==========================================
     // EVENT HANDLERS
     // ==========================================
-    elements.registrationForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    
+    // Unlock share button handler
+    elements.unlockShareBtn.addEventListener('click', () => {
+        unlockSharing();
+    });
 
-        let isValid = true;
-
-        // Validate name
-        if (!elements.playerName.value.trim()) {
-            elements.nameError.classList.add('show');
-            isValid = false;
-        } else {
-            elements.nameError.classList.remove('show');
+    // Industry selection handler (on start screen)
+    elements.playerIndustry.addEventListener('change', () => {
+        const selectedIndustry = elements.playerIndustry.value || 'other';
+        gameState.userData.industry = selectedIndustry;
+        gameState.theme = THEMES[selectedIndustry] || THEMES.other;
+        
+        // Update industry intro text
+        elements.industryIntro.innerHTML = `<strong>${gameState.theme.name}:</strong> ${gameState.theme.greeting}`;
+        
+        // Save preference
+        try {
+            const savedUser = loadUserData() || {};
+            savedUser.industry = selectedIndustry;
+            saveUserData(savedUser);
+        } catch (e) {
+            console.warn('Could not save industry preference:', e);
         }
-
-        // Validate email
-        if (!validateEmail(elements.playerEmail.value)) {
-            elements.emailError.classList.add('show');
-            isValid = false;
-        } else {
-            elements.emailError.classList.remove('show');
-        }
-
-        if (!isValid) return;
-
-        // Save user data
-        gameState.userData = {
-            name: elements.playerName.value.trim(),
-            email: elements.playerEmail.value.trim(),
-            industry: elements.playerIndustry.value || 'other'
-        };
-
-        saveUserData(gameState.userData);
-
-        // Set theme based on industry
-        gameState.theme = THEMES[gameState.userData.industry] || THEMES.other;
-
-        initAudio();
-        showStartScreen();
+        
+        trackEvent('industry_selected', { industry: selectedIndustry });
     });
 
     elements.startGameBtn.addEventListener('click', () => {
+        initAudio();
         showGameScreen();
     });
 
@@ -4063,7 +4522,7 @@
     loadDifficultyPreference();
     setupModeToggle();
     loadModePreference();
-    showRegistrationScreen();
+    showStartScreen();
 
     </script>
 </body>
