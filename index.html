@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDK for global leaderboard -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
     <style>
         /* ==========================================
            ROOT VARIABLES & RESET
@@ -1204,6 +1207,123 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary);
         }
+
+        /* ==========================================
+           LEADERBOARD STYLES
+           ========================================== */
+        .leaderboard-section {
+            background: rgba(108, 92, 231, 0.1);
+            border: 2px solid rgba(108, 92, 231, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .leaderboard-tab {
+            flex: 1;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-tab:hover {
+            border-color: var(--primary);
+            color: var(--text-light);
+        }
+
+        .leaderboard-tab.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .leaderboard-content {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-loading {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+        }
+
+        .leaderboard-empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .leaderboard-entry:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .leaderboard-entry.highlight {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .leaderboard-rank {
+            width: 35px;
+            font-size: 1.2rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .leaderboard-info {
+            flex: 1;
+            min-width: 0;
+            margin-left: 10px;
+        }
+
+        .leaderboard-name {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .leaderboard-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .leaderboard-score {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -1221,6 +1341,37 @@
             
             <div class="high-score-display" id="high-score-section">
                 <p>🏆 Your Best Score: <span id="high-score-value">0</span></p>
+            </div>
+
+            <!-- Streak Display -->
+            <div class="streak-display" id="streak-section" style="display: none; background: linear-gradient(135deg, rgba(255, 165, 0, 0.15), rgba(255, 100, 0, 0.08)); border: 2px solid rgba(255, 165, 0, 0.4); border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                    <span style="font-size: 1.8rem;">🔥</span>
+                    <div>
+                        <div style="font-size: 1.4rem; font-weight: bold; color: #FFA500;">
+                            <span id="streak-count">0</span> Day Streak!
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">
+                            +<span id="streak-bonus">0</span>% Score Bonus Active
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Code Section -->
+            <div class="team-code-section" style="background: rgba(108, 92, 231, 0.1); border: 1px solid rgba(108, 92, 231, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 5px;">👥 Team Code (optional)</label>
+                        <input type="text" id="team-code-input" placeholder="Enter code or create one" maxlength="6" style="width: 100%; padding: 10px 12px; background: rgba(108, 92, 231, 0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: var(--text-light); font-size: 0.9rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 2px;">
+                    </div>
+                    <button id="generate-team-code" style="padding: 10px 15px; background: var(--primary); border: none; border-radius: 8px; color: white; font-size: 0.8rem; cursor: pointer; white-space: nowrap; margin-top: 18px;">
+                        Generate
+                    </button>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; text-align: center;">
+                    Compete with your team! Share your code to create a private leaderboard.
+                </p>
             </div>
 
             <!-- Industry Selector -->
@@ -1350,17 +1501,39 @@
                 <p id="badge-description">Achievement unlocked</p>
             </div>
 
-            <!-- Threats Avoided Summary -->
-            <div class="threats-avoided-section" id="threats-avoided-section" style="background: rgba(0, 255, 136, 0.1); border: 2px solid rgba(0, 255, 136, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0;">
-                <h4 style="color: #00FF88; margin-bottom: 15px; font-size: 1.1rem;">🛡️ Threats Vault Protected You From</h4>
-                <div id="threats-count" style="font-size: 2rem; font-weight: bold; color: #FFFFFF; margin-bottom: 10px;">0</div>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Data disasters avoided this run</p>
+            <!-- Threats Learning Report -->
+            <div class="threats-avoided-section" id="threats-avoided-section" style="background: rgba(0, 255, 136, 0.08); border: 2px solid rgba(0, 255, 136, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0;">
+                <h4 style="color: #00FF88; margin-bottom: 8px; font-size: 1.1rem;">📚 Your Security Learning Report</h4>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                    <div style="text-align: center;">
+                        <div id="threats-count" style="font-size: 2.2rem; font-weight: bold; color: #00FF88;">0</div>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0;">Threats Avoided</p>
+                    </div>
+                    <div style="width: 1px; height: 40px; background: rgba(255,255,255,0.2);"></div>
+                    <div style="text-align: center;">
+                        <div id="unique-threats-count" style="font-size: 2.2rem; font-weight: bold; color: #64C8FF;">0</div>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0;">Hazards Learned</p>
+                    </div>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">Here's what you learned about data protection today:</p>
                 <div id="threats-list" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px;">
-                    <!-- Threat badges will be inserted here -->
+                    <!-- Detailed threat learning cards will be inserted here -->
                 </div>
                 <p id="vault-protection-message" style="color: #00FF88; font-size: 0.95rem; font-style: italic;">
                     With AutoRABIT Vault, recovery from any of these would take less than 15 minutes.
                 </p>
+            </div>
+
+            <!-- Leaderboard Section -->
+            <div class="leaderboard-section" id="leaderboard-section">
+                <h4 style="color: var(--primary); margin-bottom: 15px; font-size: 1.1rem;">🏆 Leaderboard</h4>
+                <div class="leaderboard-tabs">
+                    <button class="leaderboard-tab active" data-tab="local" id="tab-local">Your Device</button>
+                    <button class="leaderboard-tab" data-tab="global" id="tab-global">Global</button>
+                </div>
+                <div class="leaderboard-content" id="leaderboard-content">
+                    <div class="leaderboard-loading">Loading...</div>
+                </div>
             </div>
             
             <div class="vault-tip">
@@ -1402,6 +1575,20 @@
                 </div>
             </div>
             
+            <!-- Download Certificate Section -->
+            <div class="certificate-section" id="certificate-section" style="background: linear-gradient(135deg, rgba(100, 200, 255, 0.1), rgba(108, 92, 231, 0.1)); border: 2px solid rgba(100, 200, 255, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
+                <h4 style="color: #64C8FF; margin-bottom: 10px; font-size: 1rem;">🎓 Download Your Achievement</h4>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
+                    Get a shareable certificate for LinkedIn showing your data protection expertise!
+                </p>
+                <button id="download-certificate" class="btn btn-social" style="background: linear-gradient(135deg, #0077B5, #00A0DC); border: none; padding: 12px 24px; font-size: 0.9rem;">
+                    📜 Download Certificate
+                </button>
+                <button id="copy-challenge-link" class="btn btn-social" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 12px 24px; font-size: 0.9rem; margin-left: 10px;">
+                    🔗 Copy Challenge Link
+                </button>
+            </div>
+
             <div class="action-buttons">
                 <a href="#" id="cta-button" class="btn btn-cta btn-full" target="_blank" rel="noopener">
                     🛡️ Start Free Vault Trial
@@ -1875,7 +2062,14 @@
         threatsAvoided: 0,
         threatsAvoidedList: [],
         // Protected flash effects
-        protectedFlash: null
+        protectedFlash: null,
+        // Game loop guard to prevent multiple loops
+        loopRunning: false,
+        // Streak & Viral features
+        streak: 0,
+        lastPlayDate: null,
+        teamCode: null,
+        referrer: null
     };
 
     // ==========================================
@@ -1929,7 +2123,15 @@
         shareInfoSection: document.getElementById('share-info-section'),
         unlockShareBtn: document.getElementById('unlock-share-btn'),
         shareUnlockedMsg: document.getElementById('share-unlocked-msg'),
-        shareSection: document.getElementById('share-section')
+        shareSection: document.getElementById('share-section'),
+        // Viral feature elements
+        streakSection: document.getElementById('streak-section'),
+        streakCount: document.getElementById('streak-count'),
+        streakBonus: document.getElementById('streak-bonus'),
+        teamCodeInput: document.getElementById('team-code-input'),
+        generateTeamCodeBtn: document.getElementById('generate-team-code'),
+        downloadCertificate: document.getElementById('download-certificate'),
+        copyChallengeLink: document.getElementById('copy-challenge-link')
     };
 
     const ctx = elements.canvas.getContext('2d');
@@ -2061,6 +2263,252 @@
         } catch (e) {
             return 0;
         }
+    }
+
+    // ==========================================
+    // LOCAL LEADERBOARD
+    // ==========================================
+    function saveToLocalLeaderboard(score) {
+        try {
+            const entry = {
+                name: gameState.userData.name || 'Anonymous',
+                score: score,
+                industry: gameState.userData.industry || 'other',
+                date: new Date().toISOString()
+            };
+            let leaderboard = JSON.parse(localStorage.getItem('recoveryRunner_leaderboard') || '[]');
+            leaderboard.push(entry);
+            leaderboard.sort((a, b) => b.score - a.score);
+            leaderboard = leaderboard.slice(0, 10);
+            localStorage.setItem('recoveryRunner_leaderboard', JSON.stringify(leaderboard));
+        } catch (e) {
+            console.warn('Could not save to local leaderboard:', e);
+        }
+    }
+
+    function getLocalLeaderboard() {
+        try {
+            return JSON.parse(localStorage.getItem('recoveryRunner_leaderboard') || '[]');
+        } catch (e) {
+            console.warn('Could not load local leaderboard:', e);
+            return [];
+        }
+    }
+
+    // Update the most recent leaderboard entry with user's name (called after unlock sharing)
+    function updateRecentLeaderboardEntry(name) {
+        try {
+            let leaderboard = JSON.parse(localStorage.getItem('recoveryRunner_leaderboard') || '[]');
+            
+            // Find the most recent entry with current score and "Anonymous" name
+            for (let i = 0; i < leaderboard.length; i++) {
+                if (leaderboard[i].score === gameState.score && 
+                    (leaderboard[i].name === 'Anonymous' || !leaderboard[i].name)) {
+                    leaderboard[i].name = name;
+                    localStorage.setItem('recoveryRunner_leaderboard', JSON.stringify(leaderboard));
+                    console.log('[Leaderboard] Updated entry with name:', name);
+                    break;
+                }
+            }
+        } catch (e) {
+            console.warn('Could not update leaderboard entry:', e);
+        }
+    }
+
+    // ==========================================
+    // GLOBAL LEADERBOARD (Firebase)
+    // ==========================================
+    // Firebase configuration - Replace with your project's config
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+        projectId: "YOUR_PROJECT",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase (only if config is set)
+    let firebaseApp = null;
+    let database = null;
+    
+    function initFirebase() {
+        if (firebaseApp) return true;
+        if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+            console.log('[Firebase] Not configured - global leaderboard disabled');
+            return false;
+        }
+        try {
+            firebaseApp = firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            console.log('[Firebase] Initialized successfully');
+            return true;
+        } catch (e) {
+            console.warn('[Firebase] Could not initialize:', e);
+            return false;
+        }
+    }
+
+    async function submitToGlobalLeaderboard(score) {
+        if (!initFirebase()) return false;
+        try {
+            const entry = {
+                name: gameState.userData.name || 'Anonymous',
+                score: score,
+                industry: gameState.userData.industry || 'other',
+                difficulty: gameState.difficulty,
+                date: Date.now()
+            };
+            await database.ref('leaderboard').push(entry);
+            console.log('[Firebase] Score submitted to global leaderboard');
+            return true;
+        } catch (e) {
+            console.warn('[Firebase] Could not submit score:', e);
+            return false;
+        }
+    }
+
+    async function fetchGlobalLeaderboard() {
+        if (!initFirebase()) return [];
+        try {
+            const snapshot = await database.ref('leaderboard')
+                .orderByChild('score')
+                .limitToLast(10)
+                .once('value');
+            const entries = [];
+            snapshot.forEach(child => entries.push(child.val()));
+            return entries.sort((a, b) => b.score - a.score);
+        } catch (e) {
+            console.warn('[Firebase] Could not fetch leaderboard:', e);
+            return [];
+        }
+    }
+
+    // ==========================================
+    // STREAK SYSTEM (Viral Feature)
+    // ==========================================
+    function loadStreak() {
+        try {
+            const streakData = JSON.parse(localStorage.getItem('recoveryRunner_streak') || '{}');
+            const today = new Date().toDateString();
+            const lastPlay = streakData.lastPlayDate;
+            
+            if (!lastPlay) {
+                return { streak: 0, isNewDay: true };
+            }
+            
+            const lastDate = new Date(lastPlay);
+            const diffDays = Math.floor((new Date(today) - lastDate) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) {
+                return { streak: streakData.streak || 1, isNewDay: false };
+            } else if (diffDays === 1) {
+                return { streak: (streakData.streak || 0) + 1, isNewDay: true };
+            } else {
+                return { streak: 1, isNewDay: true };
+            }
+        } catch (e) {
+            return { streak: 1, isNewDay: true };
+        }
+    }
+
+    function saveStreak(streak) {
+        try {
+            localStorage.setItem('recoveryRunner_streak', JSON.stringify({
+                streak: streak,
+                lastPlayDate: new Date().toDateString()
+            }));
+        } catch (e) {
+            console.warn('Could not save streak:', e);
+        }
+    }
+
+    function getStreakBonus(streak) {
+        // 5% bonus per day, max 50%
+        return Math.min(streak * 5, 50);
+    }
+
+    // ==========================================
+    // TEAM CODE SYSTEM (Viral Feature)
+    // ==========================================
+    function loadTeamCode() {
+        try {
+            return localStorage.getItem('recoveryRunner_teamCode') || null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function saveTeamCode(code) {
+        try {
+            localStorage.setItem('recoveryRunner_teamCode', code);
+            gameState.teamCode = code;
+        } catch (e) {
+            console.warn('Could not save team code:', e);
+        }
+    }
+
+    function generateTeamCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = '';
+        for (let i = 0; i < 6; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code;
+    }
+
+    // ==========================================
+    // REFERRAL TRACKING (Viral Feature)
+    // ==========================================
+    function detectReferral() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const ref = params.get('ref') || params.get('challenge');
+            if (ref) {
+                gameState.referrer = ref;
+                trackEvent('referred_visit', { referrer: ref });
+                console.log('[Referral] User came from:', ref);
+            }
+        } catch (e) {
+            console.warn('Could not detect referral:', e);
+        }
+    }
+
+    // ==========================================
+    // SECURITY CERTIFICATE (Viral Feature)
+    // ==========================================
+    function generateCertificateData() {
+        const tier = gameState.score >= 700 ? 'Expert' : gameState.score >= 300 ? 'Pro' : 'Intern';
+        const tierEmoji = gameState.score >= 700 ? '🏆' : gameState.score >= 300 ? '⭐' : '📚';
+        const date = new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        return {
+            name: gameState.userData.name || 'Data Protection Champion',
+            score: gameState.score,
+            tier: tier,
+            tierEmoji: tierEmoji,
+            industry: gameState.theme.name,
+            threatsDefeated: gameState.threatsAvoided,
+            uniqueThreats: gameState.threatsAvoidedList.length,
+            streak: gameState.streak,
+            date: date,
+            certificateId: `VLT-${Date.now().toString(36).toUpperCase()}`
+        };
+    }
+
+    function generateShareableLink() {
+        const cert = generateCertificateData();
+        const params = new URLSearchParams({
+            challenge: gameState.userData.name || 'Champion',
+            score: gameState.score,
+            tier: cert.tier
+        });
+        return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
     }
 
     // ==========================================
@@ -2343,15 +2791,8 @@
                 this.x -= gameState.speed;
             }
             this.pulsePhase += 0.1;
-            
-            // Check if player passed this hazard (for tracking threats avoided)
-            if (!this.passed && gameState.player) {
-                const playerRight = gameState.player.x + gameState.player.width;
-                if (this.x + this.width < playerRight) {
-                    this.passed = true;
-                    // Only count if player didn't collide (handled elsewhere)
-                }
-            }
+            // Note: hazard.passed tracking is handled in the main update loop
+            // to properly detect when player successfully jumps over
         }
 
         draw(ctx) {
@@ -3001,7 +3442,9 @@
         gameState.comboTimer = 0;
         gameState.multiplier = 1;
         gameState.distance = 0;
-        gameState.baseScoreMultiplier = diff.scoreMultiplier;
+        // Apply difficulty multiplier + streak bonus
+        const streakBonusPercent = getStreakBonus(gameState.streak);
+        gameState.baseScoreMultiplier = diff.scoreMultiplier * (1 + streakBonusPercent / 100);
         
         // Reset threat tracking
         gameState.threatsAvoided = 0;
@@ -3273,12 +3716,19 @@
 
         // Update hazards and check for successful jumps
         gameState.hazards.forEach(h => {
-            const wasAhead = h.x + h.width > gameState.player.x;
-            h.update();
-            const isNowBehind = h.x + h.width < gameState.player.x;
+            // Track if hazard was in front of or at player position before update
+            const playerLeftEdge = gameState.player.x;
+            const hazardRightEdge = h.x + h.width;
+            const wasAheadOrAt = hazardRightEdge >= playerLeftEdge;
             
-            // Check if player just jumped over this hazard
-            if (wasAhead && isNowBehind && !h.passed) {
+            h.update();
+            
+            // Check if hazard is now behind player (right edge passed player's left edge)
+            const newHazardRightEdge = h.x + h.width;
+            const isNowBehind = newHazardRightEdge < playerLeftEdge;
+            
+            // If hazard moved from ahead/at to behind without being hit, player avoided it
+            if (wasAheadOrAt && isNowBehind && !h.passed) {
                 h.passed = true;
                 onHazardAvoided(h);
             }
@@ -3295,7 +3745,12 @@
 
         // Update particles
         gameState.particles.forEach(p => p.update());
-        gameState.particles = gameState.particles.filter(p => !p.isDead());
+        gameState.particles = gameState.particles.filter(p => {
+            // Some particles use isDead(), others use isOffScreen()
+            if (typeof p.isDead === 'function') return !p.isDead();
+            if (typeof p.isOffScreen === 'function') return !p.isOffScreen();
+            return true;
+        });
 
         // Update background
         gameState.bgElements.forEach(b => b.update());
@@ -3810,6 +4265,8 @@
         }
         if (gameState.isRunning) {
             requestAnimationFrame(gameLoop);
+        } else {
+            gameState.loopRunning = false;
         }
     }
 
@@ -3955,14 +4412,28 @@
         gameState.isRunning = false;
         playSound('hit');
         
+        // Update streak (save that user played today)
+        const streakData = loadStreak();
+        if (streakData.isNewDay) {
+            gameState.streak = streakData.streak;
+            saveStreak(gameState.streak);
+        }
+        
         const isNewHighScore = saveHighScore(gameState.score);
         gameState.highScore = loadHighScore();
+        
+        // Save to local leaderboard
+        saveToLocalLeaderboard(gameState.score);
+        
+        // Submit to global leaderboard (async, don't block)
+        submitToGlobalLeaderboard(gameState.score);
 
         trackEvent('game_over', { 
             score: gameState.score,
             industry: gameState.userData.industry,
             difficulty: gameState.difficulty,
-            is_high_score: isNewHighScore
+            is_high_score: isNewHighScore,
+            streak: gameState.streak
         });
 
         showEndScreen(isNewHighScore);
@@ -3986,7 +4457,11 @@
 
         // Update industry intro based on current theme
         elements.industryIntro.innerHTML = `<strong>${gameState.theme.name}:</strong> ${gameState.theme.greeting}`;
-        elements.highScoreValue.textContent = loadHighScore();
+        
+        // Hide high score section if player has never scored
+        const highScore = loadHighScore();
+        elements.highScoreValue.textContent = highScore;
+        document.getElementById('high-score-section').style.display = highScore === 0 ? 'none' : 'block';
     }
 
     function showGameScreen() {
@@ -4000,7 +4475,10 @@
         gameState.theme = THEMES[selectedIndustry] || THEMES.other;
 
         initGame();
-        gameLoop();
+        if (!gameState.loopRunning) {
+            gameState.loopRunning = true;
+            gameLoop();
+        }
     }
 
     function showEndScreen(isNewHighScore) {
@@ -4010,7 +4488,9 @@
 
         const diffName = gameState.difficultySettings.name;
         const diffIcon = gameState.difficultySettings.icon;
-        elements.endMessage.textContent = `${isNewHighScore ? 'New High Score!' : 'Great run!'} ${diffIcon}`;
+        const streakBonus = getStreakBonus(gameState.streak);
+        const streakText = streakBonus > 0 ? ` 🔥+${streakBonus}%` : '';
+        elements.endMessage.textContent = `${isNewHighScore ? 'New High Score!' : 'Great run!'} ${diffIcon}${streakText}`;
         elements.finalScore.textContent = gameState.score;
 
         // Check for badge (Intern / Pro / Expert tiers)
@@ -4055,6 +4535,9 @@
 
         // Update threats avoided section
         updateThreatsAvoidedSection();
+
+        // Update leaderboard
+        updateLeaderboard('local');
 
         // Update CTA link (without email if not provided yet)
         const ctaUrl = `https://autorabit.com/vault-free-trial?source=recovery-runner&industry=${encodeURIComponent(gameState.userData.industry)}&score=${gameState.score}&threats_avoided=${gameState.threatsAvoided}`;
@@ -4148,6 +4631,12 @@
         // Save to localStorage
         saveUserData(gameState.userData);
 
+        // Update leaderboard entry with the user's actual name
+        updateRecentLeaderboardEntry(gameState.userData.name);
+        
+        // Refresh the leaderboard display to show updated name
+        updateLeaderboard('local');
+
         // Update CTA link with email
         const ctaUrl = `https://autorabit.com/vault-free-trial?source=recovery-runner&email=${encodeURIComponent(gameState.userData.email)}&industry=${encodeURIComponent(gameState.userData.industry)}&score=${gameState.score}&threats_avoided=${gameState.threatsAvoided}`;
         elements.ctaButton.href = ctaUrl;
@@ -4163,6 +4652,110 @@
         });
     }
 
+    // ==========================================
+    // LEADERBOARD UI
+    // ==========================================
+    const INDUSTRY_ICONS = {
+        banking: '🏦',
+        healthcare: '🏥',
+        retail: '🛒',
+        other: '☁️'
+    };
+
+    function getRankDisplay(rank) {
+        if (rank === 1) return '🥇';
+        if (rank === 2) return '🥈';
+        if (rank === 3) return '🥉';
+        return `#${rank}`;
+    }
+
+    function formatDate(dateStr) {
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function renderLeaderboardEntries(entries, currentScore) {
+        const content = document.getElementById('leaderboard-content');
+        if (!content) return;
+
+        if (!entries || entries.length === 0) {
+            content.innerHTML = '<div class="leaderboard-empty">No scores yet. Be the first!</div>';
+            return;
+        }
+
+        let html = '';
+        entries.forEach((entry, index) => {
+            const rank = index + 1;
+            const isCurrentGame = entry.score === currentScore && entry.name === (gameState.userData.name || 'Anonymous');
+            const industryIcon = INDUSTRY_ICONS[entry.industry] || INDUSTRY_ICONS.other;
+            
+            html += `
+                <div class="leaderboard-entry${isCurrentGame ? ' highlight' : ''}">
+                    <div class="leaderboard-rank">${getRankDisplay(rank)}</div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${escapeHtml(entry.name || 'Anonymous')}</div>
+                        <div class="leaderboard-meta">
+                            <span>${industryIcon} ${entry.industry || 'other'}</span>
+                            <span>${formatDate(entry.date)}</span>
+                        </div>
+                    </div>
+                    <div class="leaderboard-score">${entry.score.toLocaleString()}</div>
+                </div>
+            `;
+        });
+        content.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    async function updateLeaderboard(tab = 'local') {
+        const content = document.getElementById('leaderboard-content');
+        if (!content) return;
+
+        content.innerHTML = '<div class="leaderboard-loading">Loading...</div>';
+
+        if (tab === 'local') {
+            const entries = getLocalLeaderboard();
+            renderLeaderboardEntries(entries, gameState.score);
+        } else if (tab === 'global') {
+            const entries = await fetchGlobalLeaderboard();
+            if (entries.length === 0 && firebaseConfig.apiKey === "YOUR_API_KEY") {
+                content.innerHTML = '<div class="leaderboard-empty">Global leaderboard not configured.<br><small style="color: var(--text-muted);">Set up Firebase to enable.</small></div>';
+            } else {
+                renderLeaderboardEntries(entries, gameState.score);
+            }
+        }
+    }
+
+    function setupLeaderboardTabs() {
+        const localTab = document.getElementById('tab-local');
+        const globalTab = document.getElementById('tab-global');
+
+        if (localTab) {
+            localTab.addEventListener('click', () => {
+                localTab.classList.add('active');
+                if (globalTab) globalTab.classList.remove('active');
+                updateLeaderboard('local');
+            });
+        }
+
+        if (globalTab) {
+            globalTab.addEventListener('click', () => {
+                globalTab.classList.add('active');
+                if (localTab) localTab.classList.remove('active');
+                updateLeaderboard('global');
+            });
+        }
+    }
+
     function updateThreatsAvoidedSection() {
         const section = document.getElementById('threats-avoided-section');
         const countEl = document.getElementById('threats-count');
@@ -4171,33 +4764,58 @@
 
         if (!section || !countEl || !listEl) return;
 
-        // Update count
+        // Update counts
         countEl.textContent = gameState.threatsAvoided;
+        const uniqueCountEl = document.getElementById('unique-threats-count');
+        if (uniqueCountEl) {
+            uniqueCountEl.textContent = gameState.threatsAvoidedList.length;
+        }
 
-        // Clear and populate threat badges
+        // Clear and populate threat cards with learning info
         listEl.innerHTML = '';
 
         if (gameState.threatsAvoidedList.length === 0) {
             listEl.innerHTML = '<span style="color: var(--text-muted); font-size: 0.85rem;">No threats encountered yet - try again!</span>';
         } else {
-            // Show up to 6 unique threat types
-            gameState.threatsAvoidedList.slice(0, 6).forEach(threatType => {
+            // Create a container for detailed threat cards
+            const cardsContainer = document.createElement('div');
+            cardsContainer.style.cssText = 'width: 100%; display: flex; flex-direction: column; gap: 12px;';
+            
+            // Show detailed learning cards for each threat type encountered
+            gameState.threatsAvoidedList.forEach(threatType => {
                 const solution = VAULT_SOLUTIONS[threatType];
+                const description = HAZARD_DESCRIPTIONS[threatType];
                 if (solution) {
-                    const badge = document.createElement('div');
-                    badge.style.cssText = 'background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 6px 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px;';
-                    badge.innerHTML = `<span>${solution.icon}</span><span>${threatType}</span>`;
-                    listEl.appendChild(badge);
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+                        border: 1px solid rgba(255,255,255,0.15);
+                        border-left: 4px solid ${getCategoryColor(solution.category)};
+                        border-radius: 10px;
+                        padding: 14px 16px;
+                        text-align: left;
+                    `;
+                    card.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <span style="font-size: 1.4rem;">${solution.icon}</span>
+                            <span style="font-weight: 600; color: #fff; font-size: 0.95rem;">${threatType}</span>
+                            <span style="margin-left: auto; background: rgba(255,107,107,0.2); color: #FF6B6B; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">${solution.impact}</span>
+                        </div>
+                        ${description ? `<p style="color: var(--text-muted); font-size: 0.8rem; margin: 0 0 10px 0; line-height: 1.4;">${description}</p>` : ''}
+                        <div style="background: rgba(0, 255, 136, 0.1); border-radius: 8px; padding: 10px 12px; display: flex; align-items: flex-start; gap: 10px;">
+                            <span style="color: #00FF88; font-size: 1.1rem;">✓</span>
+                            <div>
+                                <p style="color: #00FF88; font-size: 0.85rem; margin: 0 0 4px 0; font-weight: 500;">How Vault Protects You:</p>
+                                <p style="color: rgba(255,255,255,0.9); font-size: 0.8rem; margin: 0; line-height: 1.4;">${solution.vaultSolution}</p>
+                                <p style="color: #64C8FF; font-size: 0.75rem; margin: 6px 0 0 0; font-weight: 600;">⚡ Recovery Time: ${solution.recoveryTime}</p>
+                            </div>
+                        </div>
+                    `;
+                    cardsContainer.appendChild(card);
                 }
             });
-
-            // Show "+X more" if there are more types
-            if (gameState.threatsAvoidedList.length > 6) {
-                const more = document.createElement('div');
-                more.style.cssText = 'background: rgba(255,255,255,0.05); border-radius: 20px; padding: 6px 12px; font-size: 0.8rem; color: var(--text-muted);';
-                more.textContent = `+${gameState.threatsAvoidedList.length - 6} more`;
-                listEl.appendChild(more);
-            }
+            
+            listEl.appendChild(cardsContainer);
         }
 
         // Update protection message based on count
@@ -4212,6 +4830,17 @@
                 messageEl.textContent = `🏆 ${gameState.threatsAvoided} threats defeated! You're a data protection champion. Imagine this protection for your Salesforce org.`;
             }
         }
+    }
+
+    // Helper to get category color for threat cards
+    function getCategoryColor(category) {
+        const colors = {
+            data_loss: '#FF6B6B',
+            compliance: '#FFD93D',
+            security: '#FF4757',
+            sync: '#FFA502'
+        };
+        return colors[category] || '#6C5CE7';
     }
 
     // ==========================================
@@ -4517,11 +5146,153 @@
     window.addEventListener('resize', resizeCanvas);
 
     // ==========================================
+    // VIRAL FEATURE HANDLERS
+    // ==========================================
+    
+    // Team code generation
+    if (elements.generateTeamCodeBtn) {
+        elements.generateTeamCodeBtn.addEventListener('click', () => {
+            const newCode = generateTeamCode();
+            elements.teamCodeInput.value = newCode;
+            saveTeamCode(newCode);
+            trackEvent('team_code_generated', { code: newCode });
+            
+            // Visual feedback
+            elements.generateTeamCodeBtn.textContent = '✓ Created!';
+            setTimeout(() => {
+                elements.generateTeamCodeBtn.textContent = 'Generate';
+            }, 2000);
+        });
+    }
+
+    // Team code input save
+    if (elements.teamCodeInput) {
+        elements.teamCodeInput.addEventListener('blur', () => {
+            const code = elements.teamCodeInput.value.trim().toUpperCase();
+            if (code.length >= 4) {
+                saveTeamCode(code);
+                trackEvent('team_code_joined', { code: code });
+            }
+        });
+        
+        // Load saved team code
+        const savedTeamCode = loadTeamCode();
+        if (savedTeamCode) {
+            elements.teamCodeInput.value = savedTeamCode;
+            gameState.teamCode = savedTeamCode;
+        }
+    }
+
+    // Certificate download
+    if (elements.downloadCertificate) {
+        elements.downloadCertificate.addEventListener('click', () => {
+            const cert = generateCertificateData();
+            
+            // Create a text-based certificate (could be enhanced to generate image)
+            const certificateText = `
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║           🛡️ DATA PROTECTION ACHIEVEMENT CERTIFICATE 🛡️      ║
+║                                                              ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║   This certifies that                                        ║
+║                                                              ║
+║                    ${cert.name.padEnd(40)}              ║
+║                                                              ║
+║   has demonstrated exceptional data protection awareness     ║
+║   by completing Recovery Runner with outstanding results:    ║
+║                                                              ║
+║   ${cert.tierEmoji} Achievement Tier: ${cert.tier.padEnd(35)}    ║
+║   🎮 Final Score: ${cert.score.toString().padEnd(38)}    ║
+║   🛡️ Threats Defeated: ${cert.threatsDefeated.toString().padEnd(33)}    ║
+║   📚 Unique Hazards Mastered: ${cert.uniqueThreats.toString().padEnd(26)}    ║
+║   🏢 Industry Focus: ${cert.industry.padEnd(35)}    ║
+║                                                              ║
+║   Date: ${cert.date.padEnd(48)}    ║
+║   Certificate ID: ${cert.certificateId.padEnd(38)}    ║
+║                                                              ║
+║   ─────────────────────────────────────────────────────────  ║
+║                                                              ║
+║   Powered by AutoRABIT Vault - Enterprise Salesforce         ║
+║   Backup & Recovery                                          ║
+║                                                              ║
+║   🔗 autorabit.com/vault-free-trial                          ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+`.trim();
+
+            // Download as text file
+            const blob = new Blob([certificateText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Recovery-Runner-Certificate-${cert.certificateId}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            trackEvent('certificate_downloaded', { tier: cert.tier, score: cert.score });
+            
+            // Visual feedback
+            elements.downloadCertificate.textContent = '✓ Downloaded!';
+            setTimeout(() => {
+                elements.downloadCertificate.textContent = '📜 Download Certificate';
+            }, 2000);
+        });
+    }
+
+    // Copy challenge link
+    if (elements.copyChallengeLink) {
+        elements.copyChallengeLink.addEventListener('click', async () => {
+            const link = generateShareableLink();
+            
+            try {
+                await navigator.clipboard.writeText(link);
+                elements.copyChallengeLink.textContent = '✓ Copied!';
+                trackEvent('challenge_link_copied', { score: gameState.score });
+            } catch (e) {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = link;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                elements.copyChallengeLink.textContent = '✓ Copied!';
+            }
+            
+            setTimeout(() => {
+                elements.copyChallengeLink.textContent = '🔗 Copy Challenge Link';
+            }, 2000);
+        });
+    }
+
+    // Initialize streak display
+    function initializeStreak() {
+        const streakData = loadStreak();
+        gameState.streak = streakData.streak;
+        
+        if (gameState.streak > 0) {
+            const bonus = getStreakBonus(gameState.streak);
+            if (elements.streakSection) {
+                elements.streakSection.style.display = 'block';
+                elements.streakCount.textContent = gameState.streak;
+                elements.streakBonus.textContent = bonus;
+            }
+        }
+    }
+
+    // ==========================================
     // INITIALIZE
     // ==========================================
+    detectReferral();
+    initializeStreak();
     loadDifficultyPreference();
     setupModeToggle();
     loadModePreference();
+    setupLeaderboardTabs();
     showStartScreen();
 
     </script>
